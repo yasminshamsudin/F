@@ -1,2 +1,2 @@
 # F
-A program for calculating electric fields in biological systems
+A program for calculating electric fields
