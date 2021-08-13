@@ -3,8 +3,9 @@
 # By Yasmin 2021-07-02 
 # 2021-07-12 Added replicates functionality 
 # 2021-08-11 Integrated into F
-# 2021-08-11 Added functionality for adaptable number of cores based on box size
+# 2021-08-11 Added functionality for adaptable computational time based on box size
 # 2021-08-11 Tested locally
+# 2021-08-12 Tested on Sherlock
 
 # This script prepares job files for GROMACS simulations. 
 # This script submits files on the Stanford Sherlock cluster.
@@ -24,6 +25,7 @@ partitions=hns,iric,owners                  # Default for Boxers: hns
 workingDirectory=$(pwd)                     # Path to where this script is located
 
 nodes=1                                     # Default: 1
+cores=8                                     # Default: 8 on Sherlock
 replicates=5				    # Default:1
 
 ######################## NO MORE EDITING PAST THIS LINE! ###################################
@@ -44,7 +46,7 @@ for ligname in *
         echo -e "#SBATCH -p $partitions" >> COMPLEX.job
         echo -e "#SBATCH -N $nodes" >> COMPLEX.job
         echo -e "#SBATCH --ntasks-per-node=1" >> COMPLEX.job
-        echo -e "#SBATCH --cpus-per-task=CORES" >> COMPLEX.job
+        echo -e "#SBATCH --cpus-per-task=$cores" >> COMPLEX.job
         echo -e "#SBATCH --time=WALLTIME"'\n' >> COMPLEX.job
 
         # Load gromacs and python modules
@@ -113,26 +115,21 @@ for ligname in *
                 # If box size is larger than 20:
                 if [ $boxsize -gt 20 ] && [ $boxsize -le 30 ]
                         then
-                        cores=16
-                        walltime=05:00:00
+                        walltime=05:00:00 # most simulations finish in 3 h
                 elif [ $boxsize -gt 30 ] && [ $boxsize -le 40 ]
                         then
-                        cores=20
-                        walltime=08:00:00
+                        walltime=08:00:00 # tip3p in 40Å finish in 4 h
                 elif [ $boxsize -gt 40 ]
                         then
-                        cores=20
                         walltime=24:00:00
                 else
-                        cores=8
-                        walltime=3
+                        walltime=03:00:00 # most simulations finish in 1 h
                 fi
 
-                sed -i "s/CORES/$cores/g" $complex.job
                 sed -i "s/WALLTIME/$walltime/g" $complex.job
 
                 # Submit the run on Sherlock
-#	        sbatch $complex.job
+	        sbatch $complex.job
                 cd ..
 	done
 
