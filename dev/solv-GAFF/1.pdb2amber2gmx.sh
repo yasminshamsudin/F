@@ -6,6 +6,7 @@
 # 2021-07-20 Added functionality to check for charged ligands and add counterions if charged
 # 2021-07-20 Tested locally
 # 2021-08-11 Formatting updates
+# 2021-08-18 Formatting updates
 
 # This script creates ligand AMBER format toppology and lib files. 
 # AMBER top and lib files are then converted to GROMACS gro and top files.
@@ -16,7 +17,7 @@
 ####################### EDIT ONLY THESE PARAMETERS #########################################
 
 AMBERPATH=/home/yasmin/amber20/amber.sh     # Path for the Amber installation
-ligandDirectory=RUN                     # Path to the ligand directory
+runDirectory=RUN                            # Path to the run directory
 pythonVersion=python3                       # Installed python version
 
 ############ Advanced modelling. Only edit if you know what you are doing! #################
@@ -37,7 +38,7 @@ source $AMBERPATH
 
 # Convert ligand pdb to mol2 using antechamber
 
-cd $ligandDirectory
+cd $runDirectory
 
 for i in *.pdb
  do
@@ -95,18 +96,15 @@ done
 for i in *.prmtop
  do
    ligname=$( echo "$i" | sed -e 's/\.prmtop//g')
-   $pythonVersion $workingDirectory/acpype.py -p $workingDirectory/$ligandDirectory/$ligname.prmtop -x $workingDirectory/$ligandDirectory/$ligname.inpcrd
+   $pythonVersion $workingDirectory/acpype.py -p $workingDirectory/$runDirectory/$ligname.prmtop -x $workingDirectory/$runDirectory/$ligname.inpcrd
    wait
 
-   # Clean up the filenames and ligand names in files
-   mv MOL_GMX.top $ligname"_GMX.top"
-   mv MOL_GMX.gro $ligname"_GMX.gro"
-
-   # Clean up the folder
+   # Clean up folder & filenames and ligand names in files
    mkdir $ligname
-   mv $ligname"_GMX.gro" $ligname/
-   mv $ligname"_GMX.top" $ligname/
-
+   sed -i "s/MOL/LIG/g" MOL_GMX.*
+   mv MOL_GMX.top $ligname/$ligname"_GMX.top"
+   mv MOL_GMX.gro $ligname/$ligname"_GMX.gro"
+   
    mkdir $ligname/AMBER
    mv $ligname.* $ligname/AMBER
    mv *.$ligname.in $ligname/AMBER
@@ -114,4 +112,4 @@ done
 
 rm *.*
  
- ###### DONE! ##########
+###### DONE! ##########
