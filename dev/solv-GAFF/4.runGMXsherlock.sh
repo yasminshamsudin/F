@@ -6,6 +6,7 @@
 # 2021-08-11 Added functionality for adaptable computational time based on box size
 # 2021-08-11 Tested locally
 # 2021-08-12 Tested on Sherlock
+# 2021-08-18 Formatting changes
 
 # This script prepares job files for GROMACS simulations. 
 # This script submits files on the Stanford Sherlock cluster.
@@ -15,7 +16,7 @@
 
 ############################# EDIT THESE PARAMETERS #########################################
 
-ligandDirectory=RUN                         # Path to the ligand directory
+runDirectory=RUN                         # Path to the ligand directory
 pythonVersion=python                        # Installed python version
 
 partitions=hns,iric,owners                  # Default for Boxers: hns
@@ -30,14 +31,14 @@ replicates=5				    # Default:1
 
 ######################## NO MORE EDITING PAST THIS LINE! ###################################
 
-cd $ligandDirectory
+cd $runDirectory
 
 # Repeat for all ligands
 for ligname in *
  do
     cd $ligname
 
-# Create generic job-files
+    # Create generic job-files
 
         # Assign Sherlock flags for running
         echo -e "#!/bin/bash" > COMPLEX.job
@@ -53,9 +54,6 @@ for ligname in *
         echo -e "module reset" >> COMPLEX.job
 	echo -e "module load chemistry gromacs" >> COMPLEX.job
         echo -e "module load py-numpy/1.14.3_py27"'\n' >> COMPLEX.job
-
-        # Go to the complex directory
-        echo -e "cd COMPLEX"'\n' >> COMPLEX.job
 
         # Run minimization
         echo -e "gmx grompp -f ../min.mdp -c COMPLEX.gro -p COMPLEX.top -o COMPLEX_min.tpr" >> COMPLEX.job
@@ -91,16 +89,15 @@ for ligname in *
         echo -e "python BLCO.py" >> COMPLEX.job
         echo -e "wait"'\n' >> COMPLEX.job
         echo -e "rm BLCO.py" >> COMPLEX.job
-        #echo -e "mv *COMPLEX* COMPLEX/" >> COMPLEX.job
 
-# Customize job-files for all solvents
+    # Customize job-files for all solvents
 
     for i in *0q.top   # Get the name of each solvent
-     do
+        do
 
-	# Create replicates
-	for (( n = 1; n <= $replicates; n++ ))
-	 do
+	   # Create replicates
+	   for (( n = 1; n <= $replicates; n++ ))
+	     do
                 complex=$( echo "$i" | sed -e 's/\_0q.top//g')
                 mkdir $complex"_s"$n
                 sed "s/COMPLEX/$complex/g" COMPLEX.job > $complex"_s"$n/$complex.job
@@ -115,15 +112,16 @@ for ligname in *
                 # If box size is larger than 20:
                 if [ $boxsize -gt 20 ] && [ $boxsize -le 30 ]
                         then
-                        walltime=05:00:00 # most simulations finish in 3 h
+                        walltime=24:00:00 # most simulations finish in 3 h
                 elif [ $boxsize -gt 30 ] && [ $boxsize -le 40 ]
                         then
-                        walltime=08:00:00 # tip3p in 40Å finish in 4 h
+                        walltime=48:00:00 # most simulations finish in 5 h
                 elif [ $boxsize -gt 40 ]
                         then
-                        walltime=24:00:00
+                        walltime=48:00:00
+                # Otherwise for boxsizes < 20:
                 else
-                        walltime=03:00:00 # most simulations finish in 1 h
+                        walltime=05:00:00 # most simulations finish in 1 h
                 fi
 
                 sed -i "s/WALLTIME/$walltime/g" $complex.job
@@ -131,13 +129,15 @@ for ligname in *
                 # Submit the run on Sherlock
 	        sbatch $complex.job
                 cd ..
-	done
 
-        # Housekeeping
-        rm $complex.*
-	rm $complex*.top
+	   done # End for all replicates
 
-    done
+           # Housekeeping
+           rm $complex.*
+	   rm $complex*.top
+
+        done # End for all solvents
   
-    cd ..
-done
+        cd ..
+
+done # End repeat for all ligands
