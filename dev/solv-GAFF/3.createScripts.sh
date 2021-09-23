@@ -5,6 +5,7 @@
 # 2021-07-07 Tested on Sherlock 
 # 2021-08-11 Formatting edits
 # 2021-08-11 Integrated into F 
+# 2021-09-08 Added neutralization script
 
 # This script prepares input files for GROMACS simulations and analysis scripts.
 
@@ -20,7 +21,7 @@ probeAtom2=O                                 # Default: O (Could be set to N, D,
 probeAtomno1=0                               # Default for automated C atomnumber allocation: 0
 probeAtomno2=0                               # Default for automated atomnumber allocation: 0
 
-ligandDirectory=RUN                     # Path to the ligand directory
+ligandDirectory=PREP                     # Path to the ligand directory
 
 ############ Advanced modelling. Only edit if you know what you are doing! #################
 
@@ -160,7 +161,22 @@ for ligname in *
         echo -e "f_f0q.close()" >> BLCO.py
         echo -e "fields.close()" >> BLCO.py
 
-# Create minimization, heating, equilibration, and md run input files (.mdp)
+# Create neutralizing, minimization, heating, equilibration, and md run input files (.mdp)
+
+        # Create neutralizing input file
+        echo -e "; ions.mdp - used as input into grompp to generate em.tpr" > ions.mdp
+        echo -e "integrator	= steep		; Algorithm (steep = steepest descent minimization)" >> ions.mdp
+        echo -e "emtol		= 1000.0  	; Stop minimization when the maximum force < 1000.0 kJ/mol/nm" >> ions.mdp
+        echo -e "emstep      = 0.01      ; Energy step size" >> ions.mdp
+        echo -e "nsteps		= 50000	  	; Maximum number of (minimization) steps to perform"'\n' >> ions.mdp
+        echo -e "; Parameters describing how to find the neighbors of each atom and how to calculate the interactions" >> ions.mdp
+        echo -e "nstlist		    = 1	    ; Frequency to update the neighbor list and long range forces" >> ions.mdp
+        echo -e "cutoff-scheme   = Verlet" >> ions.mdp
+        echo -e "ns_type		    = grid		; Method to determine neighbor list (simple, grid)" >> ions.mdp
+        echo -e "coulombtype	    = cutoff		; Treatment of long range electrostatic interactions" >> ions.mdp
+        echo -e "rcoulomb	    = 1.0		; Short-range electrostatic cut-off" >> ions.mdp
+        echo -e "rvdw		    = 1.0		; Short-range Van der Waals cut-off" >> ions.mdp
+        echo -e "pbc		        = xyz 		; Periodic Boundary Conditions (yes/no)" >> ions.mdp
 
         # Create minimization input file
         echo -e "; min.mdp - used as input into grompp to generate em.tpr" > min.mdp
@@ -179,7 +195,7 @@ for ligname in *
 
         # Create nvt (heating) input file
         echo -e "title		= Electric Fields solvatochromism NVT equilibration" > nvt.mdp
-        echo -e "define		= -DPOSRES	; position restrain the protein"'\n' >> nvt.mdp
+#        echo -e "define		= -DPOSRES	; position restrain the protein"'\n' >> nvt.mdp
         echo -e "; Run parameters" >> nvt.mdp
         echo -e "integrator	= sd		; leap-frog integrator" >> nvt.mdp
         echo -e "nsteps		= 100000		; 1 * 100000 = 100 ps" >> nvt.mdp
@@ -223,7 +239,7 @@ for ligname in *
 
         # Create npt (equilibration) input file
         echo -e "title		= Electric Fields solvatochromism NPT equilibration" > npt.mdp
-        echo -e "define		= -DPOSRES	; position restrain the protein"'\n' >> npt.mdp
+#        echo -e "define		= -DPOSRES	; position restrain the protein"'\n' >> npt.mdp
         echo -e "; Run parameters" >> npt.mdp
         echo -e "integrator	= sd		; leap-frog integrator" >> npt.mdp
         echo -e "nsteps		= $nptsteps		; 2 * 500000 = 1000 ps = 1 ns" >> npt.mdp
