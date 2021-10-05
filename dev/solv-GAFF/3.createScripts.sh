@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# By Yasmin 2021-07-01 
-# 2021-07-02 Tested locally 
-# 2021-07-07 Tested on Sherlock 
-# 2021-08-11 Formatting edits
-# 2021-08-11 Integrated into F 
-# 2021-09-08 Added neutralization script
+# By Yasmin 2021-10-01 
+# 2021-10-01 Fetched and adapted from GitHub version.
+# 2021-10-05 Edited fetch function to get C and O charges. 
 
 # This script prepares input files for GROMACS simulations and analysis scripts.
 
-# Requires probe atoms to be in consecutive lines in the original pdb file.
-# If ligand has more than two possible instances of probe atoms (e.g two carbonyls)
-# only the first instance will be assigned. Make sure the probe atoms of interest
-# appear before the second instance in the initial ligand structure file.
+# Specific order of C and O no longer needed. If ligand has more than two possible 
+# instances of probe atoms (e.g two carbonyls) only the first instance will be assigned. 
+# If other probes are needed, manually specify them.
 
 ############################# EDIT THESE PARAMETERS #########################################
 
@@ -50,34 +46,41 @@ for ligname in *
              # For C=O probes 
              if [[ $probeAtom1=C && $probeAtom2=O ]]
                 then
+                        # Extract the lines of the probe atoms
+                        grep " c " ligatomtypes.tmp > clines.tmp
+                        grep " o " ligatomtypes.tmp > olines.tmp
+
+                        # Only keep the atomno and charge
+                        awk '{print $1" "$7}' clines.tmp > cnocharge.tmp
+                        awk '{print $1" "$7}' olines.tmp > onocharge.tmp
+
                    # For automated assignment of C=O probe atom numbers (only finds first occurrence)
                    if [[ $probeAtomno1 = 0 && $probeAtomno2 = 0 ]]
                         then
-                        # Extract the lines of the probe atoms
-                        sed '/ c /,/ o /!d;/ o /q' ligatomtypes.tmp > probes.tmp
                         
-                        # Get the probe atom numbers
-                        awk '{print $1}' probes.tmp > probeno.tmp
-                        carbonno=$( head -1 probeno.tmp )
-                        oxygenno=$( tail -1 probeno.tmp )
-
-                        # Get the probe atom charges
-                        awk '{print $7}' probes.tmp > charges.tmp
-                        carboncharge=$( head -1 charges.tmp )
-                        oxygencharge=$( tail -1 charges.tmp )
+                          # Get the 1st occurrence of both C and O
+                          head -1 cnocharge.tmp > cprobe.tmp
+                          head -1 onocharge.tmp > oprobe.tmp
+  
+                          # Get the probe atom numbers
+                          carbonno=$( awk '{print $1}' cprobe.tmp )
+                          oxygenno=$( awk '{print $1}' oprobe.tmp )
                         
                         else # If user has specified the probe atoms
-                        carbonno=$(($probeAtomno1))
-                        oxygenno=$(($probeAtomno2))
+
+                          carbonno=$(($probeAtomno1))
+                          oxygenno=$(($probeAtomno2))
+  
+                          # Get the probe atom charges
+                          grep "\s$carbono\s" cnocharge.tmp > cprobe.tmp
+                          grep "\s$oxygenno\s" onocharge.tmp > oprobe.tmp
+
+                        fi
 
                         # Get the probe atom charges
-                        grep "\s$carbono\s" ligatomtypes.tmp > cprobe.tmp
-                        grep "\s$oxygenno\s" ligatomtypes.tmp > oprobe.tmp
-                        cat cprobe.tmp oprobe.tmp > probes.tmp
-                        awk '{print $7}' probes.tmp > charges.tmp
-                        carboncharge=$( head -1 charges.tmp )
-                        oxygencharge=$( tail -1 charges.tmp )
-                        fi
+                        carboncharge=$( awk '{print $2}' cprobe.tmp )
+                        oxygencharge=$( awk '{print $2}' oprobe.tmp )
+                        
 
                 else # If not C=O probe
                 carbonno=$(($probeAtomno1))
@@ -172,7 +175,6 @@ for ligname in *
         echo -e "; Parameters describing how to find the neighbors of each atom and how to calculate the interactions" >> ions.mdp
         echo -e "nstlist		    = 1	    ; Frequency to update the neighbor list and long range forces" >> ions.mdp
         echo -e "cutoff-scheme   = Verlet" >> ions.mdp
-        echo -e "ns_type		    = grid		; Method to determine neighbor list (simple, grid)" >> ions.mdp
         echo -e "coulombtype	    = cutoff		; Treatment of long range electrostatic interactions" >> ions.mdp
         echo -e "rcoulomb	    = 1.0		; Short-range electrostatic cut-off" >> ions.mdp
         echo -e "rvdw		    = 1.0		; Short-range Van der Waals cut-off" >> ions.mdp
@@ -187,7 +189,6 @@ for ligname in *
         echo -e "; Parameters describing how to find the neighbors of each atom and how to calculate the interactions" >> min.mdp
         echo -e "nstlist		    = 10	    ; Frequency to update the neighbor list and long range forces" >> min.mdp
         echo -e "cutoff-scheme   = Verlet" >> min.mdp
-        echo -e "ns_type		    = grid		; Method to determine neighbor list (simple, grid)" >> min.mdp
         echo -e "coulombtype	    = PME		; Treatment of long range electrostatic interactions" >> min.mdp
         echo -e "rcoulomb	    = 1.0		; Short-range electrostatic cut-off" >> min.mdp
         echo -e "rvdw		    = 1.0		; Short-range Van der Waals cut-off" >> min.mdp
@@ -213,7 +214,6 @@ for ligname in *
         echo -e "lincs_order	            = 4		    ; also related to accuracy"'\n' >> nvt.mdp
         echo -e "; Neighborsearching" >> nvt.mdp
         echo -e "cutoff-scheme   = Verlet" >> nvt.mdp
-        echo -e "ns_type		    = grid		; search neighboring grid cells" >> nvt.mdp
         echo -e "nstlist		    = 10		; 20 fs, largely irrelevant with Verlet" >> nvt.mdp
         echo -e "rcoulomb	    = 1.0		; short-range electrostatic cutoff (in nm)" >> nvt.mdp
         echo -e "rvdw		    = 1.0		; short-range van der Waals cutoff (in nm)" >> nvt.mdp
@@ -257,7 +257,6 @@ for ligname in *
         echo -e "lincs_order	            = 4		    ; also related to accuracy"'\n' >> npt.mdp
         echo -e "; Neighborsearching" >> npt.mdp
         echo -e "cutoff-scheme   = Verlet" >> npt.mdp
-        echo -e "ns_type		    = grid		; search neighboring grid cells" >> npt.mdp
         echo -e "nstlist		    = 10	; 20 fs, largely irrelevant with Verlet" >> npt.mdp
         echo -e "rcoulomb	    = 1.0		; short-range electrostatic cutoff (in nm)" >> npt.mdp
         echo -e "rvdw		    = 1.0		; short-range van der Waals cutoff (in nm)" >> npt.mdp
@@ -306,7 +305,6 @@ for ligname in *
         echo -e "lincs_order	            = 4		    ; also related to accuracy"'\n' >> md.mdp
         echo -e "; Neighborsearching" >> md.mdp
         echo -e "cutoff-scheme   = Verlet" >> md.mdp
-        echo -e "ns_type		    = grid		; search neighboring grid cells" >> md.mdp
         echo -e "nstlist		    = 10		; 20 fs, largely irrelevant with Verlet" >> md.mdp
         echo -e "rcoulomb	    = 1.0		; short-range electrostatic cutoff (in nm)" >> md.mdp
         echo -e "rvdw		    = 1.0		; short-range van der Waals cutoff (in nm)" >> md.mdp
