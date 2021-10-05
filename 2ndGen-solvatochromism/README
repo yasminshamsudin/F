@@ -1,4 +1,4 @@
-## The Second Generation scripts use a pdb file as starting structure and generate AM1-BCC charges from antechamber and creates gromacs-compatible parameter and structure files. ##
+# The Second Generation scripts use a pdb file as starting structure and generate AM1-BCC charges from antechamber and creates gromacs-compatible parameter and structure files.
 
 In 1.pdb2amber2gmx.sh a pdb file gets GAFF vdw parameters and electrostatic parameters from AM1-BCC. 
 It is then converted to gromacs .top and .gro files using the acpype.py script.
