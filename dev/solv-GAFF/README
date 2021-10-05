@@ -1,0 +1,7 @@
+# Scripts for 3rd gen solvatochromism electric field calculations
+The starting structure here comes from Geometry optimized structures (HF 6-31d*) and ESP charges.
+
+The 1st script converts the charges to RESP charges using antechamber and converts the structure and GAFF2-parameters to gromacs format.
+The 2nd script builds and solvates the system. The solvent parameters (GAFF2, RESP) are created using the 1st script and optimized structures.
+The 3rd script automatically finds the probe atoms and charges and creates the input files for MD simulations and electric field calculations.
+The 4th script should be placed on a cluster. It creates the run file and submits it to the cluster.
