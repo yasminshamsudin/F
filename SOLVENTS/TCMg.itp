@@ -1,0 +1,44 @@
+; GMX_trichloromethane/trichloromethane.top created by rdparm2gmx.pl Mon Jun 13 11:49:15 CEST 2011
+; GAFF parameters obtained from Chu. Formatted by Yasmin.
+
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+1               2               yes             0.5     0.8333
+
+[ atomtypes ]
+;name  bond_type    mass    charge   ptype          sigma      epsilon
+ c3       c3          0.00000  0.00000   A     3.39967e-01   4.57730e-01 ; 1.91  0.1094
+ cl       cl          0.00000  0.00000   A     3.47094e-01   1.10876e+00 ; 1.95  0.2650
+ h3       h3          0.00000  0.00000   A     2.11499e-01   6.56888e-02
+
+[ moleculetype ]
+; Name            nrexcl
+SOL             3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB
+     1         cl      1    SOL    CL      1    0.00070  35.500000
+     2         c3      1    SOL     C      2   -0.30270  12.000000
+     3         h3      1    SOL     H      3    0.30060   1.000000
+     4         cl      1    SOL    CL      4    0.00070  35.500000
+     5         cl      1    SOL    CL      5    0.00070  35.500000
+
+[ bonds ]
+;  ai    aj funct  r  k
+    2     3     1  1.0930e-01  2.8108e+05
+    2     4     1  1.7860e-01  2.3347e+05
+    2     5     1  1.7860e-01  2.3347e+05
+    2     1     1  1.7860e-01  2.3347e+05
+
+[ pairs ]
+;  ai    aj funct
+
+[ angles ]
+;  ai    aj    ak funct  theta   cth
+    3     2     4     1  1.0765e+02  3.3723e+02
+    3     2     5     1  1.0765e+02  3.3723e+02
+    3     2     1     1  1.0765e+02  3.3723e+02
+    4     2     5     1  1.1103e+02  4.5355e+02
+    4     2     1     1  1.1103e+02  4.5355e+02
+    5     2     1     1  1.1103e+02  4.5355e+02
+

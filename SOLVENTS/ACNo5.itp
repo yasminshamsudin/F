@@ -1,0 +1,58 @@
+; OPLS parameters from Macromodel (OPLS_2005) 
+; (Note: Macromodel gives values in Å and kcal/mol, Gromacs uses nm and kJ/mol)
+; 211201 Created and edited by Yasmin to fit automated electric fields calculations
+
+[ atomtypes ]
+;name  bond_type    mass    charge   ptype          sigma      epsilon
+ c3       c3         12.01100  0.00000   A     3.30000E-01   2.76144E-01
+ hc       hc          1.00800  0.00000   A     2.50000E-01   0.62760E-01
+ c1       c1         12.01100  0.00000   A     3.30000E-01   2.76144E-01
+ n1       n1         14.00700  0.00000   A     3.28000E-01   7.11280E-01
+
+[ moleculetype ]
+; Name               nrexcl
+SOL                   3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB
+     1         c3      1    SOL     C1      1    -0.080000    12.0110 
+     2         hc      1    SOL     H1      1     0.060000     1.0080 
+     3         hc      1    SOL     H2      1     0.060000     1.0080 
+     4         hc      1    SOL     H3      1     0.060000     1.0080 
+     5         c1      1    SOL     C2      1     0.460000    12.0110 
+     6         n1      1    SOL     N1      1    -0.560000    14.0070 
+
+[ bonds ]
+;  ai    aj funct  r  k
+    2     1     1      0.1090 284512.000
+    3     1     1      0.1090 284512.000
+    4     1     1      0.1090 284512.000
+    5     1     1      0.1470 326352.000
+    6     5     1      0.1157 543920.000
+
+[ pairs ]
+;  ai    aj funct
+     2     6    1
+     3     6    1
+     4     6    1
+
+[ angles ]
+;  ai    aj    ak funct            c0            c1            c2            c3 
+    2     1     3     1    107.800    276.144
+    2     1     4     1    107.800    276.144
+    2     1     5     1    108.500    292.880
+    1     5     6     1    180.000   1255.200
+    3     1     4     1    107.800    276.144
+    4     1     5     1    108.500    292.880
+    3     1     5     1    108.500    292.880
+
+[ dihedrals ]
+; PROPER DIHEDRAL ANGLES
+;  ai    aj    ak    al funct            c0            c1            c2            c3            c4            c5
+    6    5    1    2        3       0.000   0.000   0.000  -0.000  -0.000   0.000
+    6    5    1    3        3       0.000   0.000   0.000  -0.000  -0.000   0.000
+    6    5    1    4        3       0.000   0.000   0.000  -0.000  -0.000   0.000
+
+
+
+

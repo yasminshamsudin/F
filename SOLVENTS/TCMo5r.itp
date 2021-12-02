@@ -1,0 +1,44 @@
+; RESP charges (HF 6-31G*) from Gaussian 16, (not acpype)
+; OPLS parameters from Macromodel (OPLS_2005) [same as LigParGen]
+; (Note: Macromodel gives values in Å and kcal/mol, Gromacs uses nm and kJ/mol)
+; 211201 Created and edited by Yasmin to fit automated electric fields calculations
+
+[ atomtypes ]
+;name  bond_type    mass    charge   ptype          sigma      epsilon
+ cl       cl         35.45000  0.00000   A     3.40000E-01   1.25520E+00
+ h3       h3          1.00800  0.00000   A     2.50000E-01   1.25520E-01
+ c3       c3         12.01100  0.00000   A     3.50000E-01   2.76144E-01
+
+[ moleculetype ]
+; Name               nrexcl
+SOL                   3
+
+[ atoms ]
+;   nr    type   resnr  residu    atom    cgnr        charge          mass
+     1         cl      1     SOL      CL1      1     0.003375    35.4500 
+     2         c3      1     SOL       C1      1    -0.318046    12.0110 
+     3         h3      1     SOL       H1      1     0.307921     1.0080 
+     4         cl      1     SOL      CL3      1     0.003375    35.4500 
+     5         cl      1     SOL      CL2      1     0.003375    35.4500 
+
+[ bonds ]
+;  ai    aj funct  r  k
+    1     2     1      0.1781 205016.000
+    4     2     1      0.1781 205016.000
+    5     2     1      0.1781 205016.000
+    3     2     1      0.1090 284512.000
+
+[ pairs ]
+;  ai    aj funct
+
+[ angles ]
+;  ai    aj    ak funct            c0            c1            c2            c3 
+    1     2     4     1    111.700    652.704
+    1     2     5     1    111.700    652.704
+    1     2     3     1    107.600    426.768
+    4     2     5     1    111.700    652.704
+    5     2     3     1    107.600    426.768
+    4     2     3     1    107.600    426.768
+
+
+

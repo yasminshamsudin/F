@@ -1,0 +1,39 @@
+; LIG_GMX.top created by acpype (Rev: 365) on Wed Sep 29 15:40:01 2021
+; RESP charges (HF 6-31G*) from Gaussian 16, GAFF2 parameters from antechamber
+; Created and edited by Yasmin to fit automated electric fields calculations
+
+[ atomtypes ]
+;name   bond_type     mass     charge   ptype   sigma         epsilon       Amb
+ cl       cl          0.00000  0.00000   A     3.46595e-01   1.10374e+00 ; 1.95  0.2638
+ c3       c3          0.00000  0.00000   A     3.39771e-01   4.51035e-01 ; 1.91  0.1078
+ h2       h2          0.00000  0.00000   A     2.24382e-01   8.70272e-02 ; 1.26  0.0208
+
+[ moleculetype ]
+;name            nrexcl
+ SOL              3
+
+[ atoms ]
+;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
+     1   cl     1   SOL   CL1    1    -0.099812     35.45000 ; qtot -0.100
+     2   c3     1   SOL    C1    2    -0.215170     12.01000 ; qtot -0.315
+     3   h2     1   SOL    H1    3     0.207397      1.00800 ; qtot -0.108
+     4   h2     1   SOL    H2    4     0.207397      1.00800 ; qtot 0.100
+     5   cl     1   SOL   CL2    5    -0.099812     35.45000 ; qtot 0.000
+
+[ bonds ]
+;   ai     aj funct   r             k
+     1      2   1    1.8040e-01    1.3012e+05 ;    CL1 - C1    
+     2      3   1    1.0960e-01    3.1572e+05 ;     C1 - H1    
+     2      4   1    1.0960e-01    3.1572e+05 ;     C1 - H2    
+     2      5   1    1.8040e-01    1.3012e+05 ;     C1 - CL2   
+
+[ angles ]
+;   ai     aj     ak    funct   theta         cth
+     1      2      3      1    1.0699e+02    4.0836e+02 ;    CL1 - C1     - H1    
+     1      2      4      1    1.0699e+02    4.0836e+02 ;    CL1 - C1     - H2    
+     1      2      5      1    1.0933e+02    6.8116e+02 ;    CL1 - C1     - CL2   
+     3      2      4      1    1.1020e+02    3.2217e+02 ;     H1 - C1     - H2    
+     3      2      5      1    1.0699e+02    4.0836e+02 ;     H1 - C1     - CL2   
+     4      2      5      1    1.0699e+02    4.0836e+02 ;     H2 - C1     - CL2   
+
+
