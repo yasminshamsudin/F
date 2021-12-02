@@ -1,4 +1,6 @@
-# These solvent parameter files for electric fields calculations have been parameterized according to the following procedures:
+# Solvent parameters repository
+
+These solvent parameter files for electric fields calculations have been parameterized according to the following procedures:
 
 1. XXXg   : GAFF parameters inherited from previous members in the Boxer lab, with corrections
 2. XXXo   : OPLS_2001 Lennard-Jones parameters parameters and charges from LigParGen server
