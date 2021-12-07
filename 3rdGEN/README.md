@@ -6,3 +6,4 @@ These scripts prepare ligand files starting with RESP files from GAUSSIAN opt/fr
 2. Ligands are solvated in various solvents and in user-defined box sizes.
 3. Input files for simulations and analyses are created.
 4. Files are submitted for simulations on clusters.
+5. All files are analyzed, with average electric fields, standard deviations, and standard error of the mean output. The analysis file is found at 2ndGen-solvatochromism/5.getFields.sh
